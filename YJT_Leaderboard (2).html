@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YJT Communications | KPI Leaderboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--red:#C8102E;--gold:#C9A84C;--gold-light:#E8C96A;--black:#0D0D0D;--dark:#161616;--card:#1E1E1E;--border:#2A2A2A;--text:#F0F0F0;--muted:#888;--green:#2ECC71;--amber:#F39C12;--danger:#E74C3C;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--black);color:var(--text);font-family:'Barlow',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(200,16,46,0.12) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 100% 100%,rgba(201,168,76,0.06) 0%,transparent 50%);pointer-events:none;z-index:0;}
+.container{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 20px 60px;}
+header{padding:40px 0 30px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;}
+.brand-line{font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,6vw,64px);letter-spacing:4px;color:var(--text);line-height:1;}
+.brand-line span{color:var(--red);}
+.subtitle{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:600;letter-spacing:6px;text-transform:uppercase;color:var(--gold);margin-top:4px;}
+.header-divider{width:100%;height:1px;background:linear-gradient(90deg,transparent,var(--red),var(--gold),transparent);margin:20px 0 0;}
+.controls{display:flex;align-items:center;justify-content:space-between;padding:16px 0 20px;flex-wrap:wrap;gap:12px;}
+.period-badge{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);background:rgba(201,168,76,0.08);border:1px solid rgba(201,168,76,0.25);padding:6px 16px;border-radius:3px;}
+.btn{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:8px 18px;border-radius:3px;border:none;cursor:pointer;transition:all 0.2s;}
+.btn-primary{background:var(--red);color:white;}.btn-primary:hover{background:#e01232;transform:translateY(-1px);}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border);}.btn-ghost:hover{color:var(--text);border-color:var(--muted);}
+.btn-gold{background:var(--gold);color:var(--black);}.btn-gold:hover{background:var(--gold-light);}
+.weight-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;padding:12px 16px;background:rgba(255,255,255,0.02);border-radius:6px;border:1px solid var(--border);}
+.weight-item{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--muted);}
+.weight-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.podium{display:grid;grid-template-columns:1fr 1.1fr 1fr;gap:12px;margin-bottom:24px;}
+.podium-card{border-radius:6px;padding:24px 16px 20px;text-align:center;position:relative;overflow:hidden;animation:slideUp 0.5s ease both;border:1px solid transparent;}
+.podium-card.rank-1{background:linear-gradient(160deg,#1a1500,#1e1800);border-color:var(--gold);animation-delay:0.1s;}
+.podium-card.rank-2{background:linear-gradient(160deg,#1a1a1a,#141414);border-color:#A8A8A8;animation-delay:0.05s;}
+.podium-card.rank-3{background:linear-gradient(160deg,#1a0e0b,#150c09);border-color:#CD7F32;animation-delay:0.15s;}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+.podium-medal{font-size:32px;margin-bottom:8px;display:block;}
+.podium-rank{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:3px;margin-bottom:4px;}
+.rank-1 .podium-rank{color:var(--gold);}.rank-2 .podium-rank{color:#C0C0C0;}.rank-3 .podium-rank{color:#CD7F32;}
+.podium-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(18px,3vw,26px);letter-spacing:2px;color:white;line-height:1.1;margin-bottom:2px;}
+.podium-store{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
+.podium-score{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:2px;line-height:1;}
+.rank-1 .podium-score{color:var(--gold);}.rank-2 .podium-score{color:#C0C0C0;}.rank-3 .podium-score{color:#CD7F32;}
+.podium-score-label{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:2px;}
+.podium-kpis{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:14px;}
+.podium-kpi{background:rgba(0,0,0,0.3);border-radius:4px;padding:6px 8px;}
+.podium-kpi-label{font-size:9px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);}
+.podium-kpi-val{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:var(--text);}
+.section-label{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:11px;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.table-wrap{border-radius:6px;overflow:hidden;border:1px solid var(--border);overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead tr{background:#111;border-bottom:2px solid var(--red);}
+th{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:12px 10px;text-align:center;white-space:nowrap;}
+th:nth-child(2){text-align:left;}
+tbody tr{border-bottom:1px solid var(--border);transition:background 0.15s;animation:fadeIn 0.4s ease both;}
+tbody tr:hover{background:rgba(255,255,255,0.03);}
+tbody tr:last-child{border-bottom:none;}
+@keyframes fadeIn{from{opacity:0;transform:translateX(-6px);}to{opacity:1;transform:translateX(0);}}
+td{padding:11px 10px;text-align:center;vertical-align:middle;}
+td:nth-child(2){text-align:left;}
+.rank-num{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--muted);}
+.rep-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;color:var(--text);letter-spacing:0.5px;}
+.rep-store{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:1px;}
+.kpi-val{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:14px;}
+.kpi-val.hit{color:var(--green);}.kpi-val.miss{color:var(--danger);}.kpi-val.close{color:var(--amber);}.kpi-val.neutral{color:var(--text);}
+.score-pill{display:inline-flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;padding:3px 12px;border-radius:20px;min-width:64px;}
+.score-high{background:rgba(46,204,113,0.15);color:var(--green);border:1px solid rgba(46,204,113,0.3);}
+.score-mid{background:rgba(243,156,18,0.15);color:var(--amber);border:1px solid rgba(243,156,18,0.3);}
+.score-low{background:rgba(231,76,60,0.15);color:var(--danger);border:1px solid rgba(231,76,60,0.3);}
+.score-bar{height:3px;border-radius:2px;background:var(--border);margin-top:4px;overflow:hidden;}
+.score-bar-fill{height:100%;border-radius:2px;}
+.edit-btn{background:none;border:1px solid var(--border);color:var(--muted);font-size:11px;padding:3px 9px;border-radius:3px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:600;letter-spacing:1px;transition:all 0.15s;white-space:nowrap;}
+.edit-btn:hover{border-color:var(--gold);color:var(--gold);}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity 0.2s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--card);border:1px solid var(--border);border-top:3px solid var(--red);border-radius:8px;width:100%;max-width:560px;padding:28px;transform:translateY(12px);transition:transform 0.2s;max-height:90vh;overflow-y:auto;}
+.modal-overlay.open .modal{transform:translateY(0);}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--text);margin-bottom:4px;}
+.modal-sub{font-size:12px;color:var(--muted);margin-bottom:22px;font-weight:500;}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-group{display:flex;flex-direction:column;gap:5px;}
+.form-group.full{grid-column:1/-1;}
+label{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+input,select{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:4px;color:var(--text);font-family:'Barlow',sans-serif;font-size:14px;padding:9px 12px;transition:border-color 0.15s;outline:none;width:100%;}
+input:focus,select:focus{border-color:var(--red);}
+select option{background:var(--card);}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;padding-top:18px;border-top:1px solid var(--border);}
+.target-chip{font-size:11px;font-weight:600;padding:4px 12px;border-radius:20px;background:rgba(200,16,46,0.1);border:1px solid rgba(200,16,46,0.25);color:#e05070;letter-spacing:0.5px;}
+footer{text-align:center;padding:24px 0 0;font-size:11px;color:#444;letter-spacing:1px;font-weight:600;text-transform:uppercase;border-top:1px solid var(--border);margin-top:30px;}
+@media(max-width:700px){.podium{grid-template-columns:1fr;}.podium-card.rank-2{order:-1;}.form-grid{grid-template-columns:1fr;}.hide-mobile{display:none;}}
+</style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <div class="brand-line">YJT <span>COMMUNICATIONS</span></div>
+    <div class="subtitle">Sales Rep KPI Leaderboard</div>
+    <div class="header-divider"></div>
+  </header>
+
+  <div class="controls">
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <div class="period-badge">February 2026</div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <div class="target-chip">Goals Per Store</div>
+        <div class="target-chip">Protection ≥ 55%</div>
+        <div class="target-chip">Perks ≥ 63%</div>
+        <div class="target-chip">Conv ≥ 20%</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-gold" onclick="openAddModal()">+ Add Rep</button>
+      <button class="btn btn-ghost" onclick="openTargetsModal()">⚙ Targets</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('importModal').classList.add('open')">⬆ Import</button>
+    </div>
+  </div>
+
+  <div class="weight-bar" id="weightBar"></div>
+  <div id="podium" class="podium"></div>
+  <div class="section-label">Full Rankings</div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr id="tableHead"></tr></thead>
+      <tbody id="leaderboardBody"></tbody>
+    </table>
+  </div>
+  <footer>YJT Communications &nbsp;·&nbsp; February 2026 &nbsp;·&nbsp; Internal Use Only</footer>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Edit Rep</div>
+    <div class="modal-sub">Update KPI data — scores recalculate instantly</div>
+    <div class="form-grid">
+      <div class="form-group full"><label>Rep Name</label><input type="text" id="f-name" placeholder="Full Name"></div>
+      <div class="form-group"><label>Store</label>
+        <select id="f-store">
+          <option>Kirkman</option><option>Okeechobee</option><option>Royal Palm</option>
+          <option>Westlake</option><option>Maricamp</option><option>Ocala</option>
+          <option>Orlando</option><option>Boca</option><option>Clewiston</option><option>Apopka</option>
+        </select>
+      </div>
+      <div class="form-group"><label>CGSA</label><input type="number" id="f-ga" min="0"></div>
+      <div class="form-group"><label>Upgrades</label><input type="number" id="f-up" min="0"></div>
+      <div class="form-group"><label>VZ Protection % (decimal)</label><input type="number" id="f-prot" step="0.01" min="0"></div>
+      <div class="form-group"><label>Perks Rate (decimal)</label><input type="number" id="f-perks" step="0.01" min="0"></div>
+      <div class="form-group"><label>Box Conv % (decimal)</label><input type="number" id="f-conv" step="0.001" min="0"></div>
+      <div class="form-group"><label>VHI</label><input type="number" id="f-hi" min="0"></div>
+      <div class="form-group"><label>Premium % (decimal)</label><input type="number" id="f-premium" step="0.01" min="0"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-ghost" id="deleteBtn" onclick="deleteRep()" style="color:#E74C3C;border-color:#E74C3C;">Delete</button>
+      <button class="btn btn-primary" onclick="saveRep()">Save & Recalculate</button>
+    </div>
+  </div>
+</div>
+
+<!-- TARGETS MODAL -->
+<div class="modal-overlay" id="targetsModal">
+  <div class="modal" style="max-width:860px;">
+    <div class="modal-title">⚙ Store Targets</div>
+    <div class="modal-sub">Each store has independent goals — Base target used for scoring, Stretch shown for reference</div>
+    <div style="overflow-x:auto;">
+      <table id="targetsTable" style="width:100%;border-collapse:collapse;font-size:12px;">
+        <thead><tr id="targetsHead"></tr></thead>
+        <tbody id="targetsTableBody"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:12px;padding:10px 12px;background:rgba(201,168,76,0.06);border:1px solid rgba(201,168,76,0.2);border-radius:4px;font-size:11px;color:#C9A84C;">
+      💡 Protection, Perks, Conv, and Premium are entered as decimals (e.g. 0.55 = 55%). CGSA, Upgrades, and VHI are whole numbers.
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeTargetsModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveTargets()">Apply & Recalculate All</button>
+    </div>
+  </div>
+</div>
+
+<!-- IMPORT MODAL -->
+<div class="modal-overlay" id="importModal">
+  <div class="modal" style="max-width:600px;">
+    <div class="modal-title">⬆ Import Excel File</div>
+    <div class="modal-sub">Upload your monthly KPI spreadsheet — data pulled from "Raw Data" or "Current Month" tab</div>
+    <div id="importDropZone" style="border:2px dashed #3A3A3A;border-radius:6px;padding:36px 20px;text-align:center;cursor:pointer;transition:border-color 0.2s;margin-bottom:16px;"
+      onclick="document.getElementById('importFileInput').click()"
+      ondragover="event.preventDefault();this.style.borderColor='#C8102E'"
+      ondragleave="this.style.borderColor='#3A3A3A'"
+      ondrop="handleFileDrop(event)">
+      <div style="font-size:36px;margin-bottom:10px;">📂</div>
+      <div style="font-family:'Barlow Condensed';font-weight:700;font-size:16px;color:#F0F0F0;margin-bottom:4px;">Click to browse or drag & drop</div>
+      <div style="font-size:12px;color:#666;">.xlsx or .xls files only</div>
+    </div>
+    <input type="file" id="importFileInput" accept=".xlsx,.xls" style="display:none" onchange="handleFileSelect(event)">
+    <div id="importStatus" style="display:none;padding:12px 14px;border-radius:4px;font-size:13px;margin-bottom:14px;"></div>
+    <div id="importPreview" style="display:none;">
+      <div style="font-family:'Barlow Condensed';font-weight:700;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#888;margin-bottom:8px;">PREVIEW</div>
+      <div style="max-height:200px;overflow-y:auto;border:1px solid #2A2A2A;border-radius:4px;">
+        <table style="width:100%;border-collapse:collapse;font-size:11px;">
+          <thead><tr id="importPreviewHead" style="background:#111;"></tr></thead>
+          <tbody id="importPreviewBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="document.getElementById('importModal').classList.remove('open');resetImport()">Cancel</button>
+      <button class="btn btn-primary" id="importConfirmBtn" style="display:none" onclick="confirmImport()">Import & Replace Data</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── KPI CONFIG — 7 KPIs ───────────────────────────────────────────────────────
+// id matches rep data keys | weight must sum to 1.0 | isPct = stored as decimal
+let kpiConfig = [
+  { id:'ga',      label:'CGSA',         weight:0.25, isPct:false, color:'#3498DB' },
+  { id:'up',      label:'Upgrades',     weight:0.15, isPct:false, color:'#9B59B6' },
+  { id:'prot',    label:'Protection %', weight:0.20, isPct:true,  color:'#E74C3C' },
+  { id:'perks',   label:'Perks',        weight:0.15, isPct:true,  color:'#F39C12' },
+  { id:'conv',    label:'Conv %',       weight:0.10, isPct:true,  color:'#1ABC9C' },
+  { id:'hi',      label:'VHI',          weight:0.10, isPct:false, color:'#E67E22' },
+  { id:'premium', label:'Premium %',    weight:0.05, isPct:true,  color:'#8E44AD' },
+];
+
+const STORES = ['Kirkman','Okeechobee','Royal Palm','Westlake','Maricamp','Ocala','Orlando','Boca','Clewiston','Apopka'];
+
+// Per-store targets — sourced from YJT Current Month tab
+// base/stretch: prot/perks/conv/premium = decimals; ga/up/hi = whole numbers
+let storeTargets = {
+  'Kirkman':    { ga:19,gaS:21, up:16,upS:19, prot:0.55,protS:0.65, perks:0.63,perksS:0.80, conv:0.20,convS:0.22, hi:3,hiS:5, premium:0.65,premiumS:0.80 },
+  'Okeechobee': { ga:19,gaS:21, up:16,upS:19, prot:0.55,protS:0.65, perks:0.63,perksS:0.80, conv:0.20,convS:0.22, hi:3,hiS:5, premium:0.65,premiumS:0.80 },
+  'Royal Palm': { ga:19,gaS:21, up:16,upS:19, prot:0.55,protS:0.65, perks:0.63,perksS:0.80, conv:0.20,convS:0.22, hi:3,hiS:5, premium:0.65,premiumS:0.80 },
+  'Westlake':   { ga:19,gaS:21, up:16,upS:19, prot:0.55,protS:0.65, perks:0.63,perksS:0.80, conv:0.20,convS:0.22, hi:3,hiS:5, premium:0.65,premiumS:0.80 },
+  'Maricamp':   { ga:19,gaS:21, up:16,upS:19, prot:0.55,protS:0.65, perks:0.63,perksS:0.80, conv:0.20,convS:0.22, hi:3,hiS:5, premium:0.65,premiumS:0.80 },
+  'Ocala':      { ga:14,gaS:16, up:16,upS:19, prot:0.55,protS:0.65, perks:0.63,perksS:0.80, conv:0.20,convS:0.22, hi:3,hiS:5, premium:0.65,premiumS:0.80 },
+  'Orlando':    { ga:19,gaS:21, up:16,upS:19, prot:0.55,protS:0.65, perks:0.63,perksS:0.80, conv:0.20,convS:0.22, hi:3,hiS:5, premium:0.65,premiumS:0.80 },
+  'Boca':       { ga:14,gaS:16, up:16,upS:19, prot:0.55,protS:0.65, perks:0.63,perksS:0.80, conv:0.20,convS:0.22, hi:3,hiS:5, premium:0.65,premiumS:0.80 },
+  'Clewiston':  { ga:19,gaS:21, up:16,upS:19, prot:0.55,protS:0.65, perks:0.63,perksS:0.80, conv:0.20,convS:0.22, hi:3,hiS:5, premium:0.65,premiumS:0.80 },
+  'Apopka':     { ga:19,gaS:21, up:16,upS:19, prot:0.55,protS:0.65, perks:0.63,perksS:0.80, conv:0.20,convS:0.22, hi:3,hiS:5, premium:0.65,premiumS:0.80 },
+};
+
+let reps = [
+  {name:"Wael Elberry",        store:"Kirkman",    ga:51,up:10,prot:0.857,perks:0.795,conv:0.386,hi:4,premium:0.692},
+  {name:"Dayan Rojas",         store:"Boca",       ga:20,up:21,prot:1.111,perks:1.500,conv:0.306,hi:3,premium:0.500},
+  {name:"Jeremy Dominguez",    store:"Kirkman",    ga:38,up:13,prot:0.750,perks:0.889,conv:0.273,hi:4,premium:0.393},
+  {name:"Laura Caro",          store:"Kirkman",    ga:34,up:16,prot:0.737,perks:0.631,conv:0.412,hi:2,premium:0.500},
+  {name:"Gary Padgett",        store:"Royal Palm", ga:22,up:22,prot:0.583,perks:1.200,conv:0.512,hi:3,premium:0.571},
+  {name:"Denzel Johnson",      store:"Westlake",   ga:20,up:18,prot:0.739,perks:1.000,conv:0.359,hi:2,premium:0.600},
+  {name:"Christopher Saydeh",  store:"Royal Palm", ga:17,up:15,prot:0.750,perks:0.944,conv:0.319,hi:3,premium:0.478},
+  {name:"Jeremy Phillips",     store:"Kirkman",    ga:26,up:14,prot:0.524,perks:0.857,conv:0.266,hi:4,premium:0.731},
+  {name:"Garrick Anglin",      store:"Okeechobee", ga:18,up:18,prot:0.636,perks:0.864,conv:0.161,hi:4,premium:0.655},
+  {name:"Matheus Costa",       store:"Kirkman",    ga:25,up:9, prot:0.556,perks:0.905,conv:0.209,hi:3,premium:0.652},
+  {name:"Antonio Fergile",     store:"Kirkman",    ga:23,up:13,prot:0.581,perks:0.739,conv:0.250,hi:1,premium:0.576},
+  {name:"Keonte Sims",         store:"Boca",       ga:8, up:16,prot:0.857,perks:1.286,conv:0.176,hi:2,premium:0.750},
+  {name:"Roxana Hernandez",    store:"Okeechobee", ga:22,up:20,prot:0.538,perks:0.528,conv:0.222,hi:8,premium:0.417},
+  {name:"Christopher Vanegas", store:"Clewiston",  ga:18,up:6, prot:0.867,perks:0.923,conv:0.126,hi:5,premium:0.471},
+  {name:"Christofer Bullock",  store:"Okeechobee", ga:23,up:24,prot:0.448,perks:0.276,conv:0.209,hi:4,premium:0.472},
+  {name:"Vance Denton",        store:"Okeechobee", ga:14,up:25,prot:0.364,perks:0.636,conv:0.170,hi:5,premium:0.441},
+  {name:"Reuben Rosa",         store:"Ocala",      ga:8, up:10,prot:0.778,perks:1.750,conv:0.180,hi:2,premium:0.800},
+  {name:"Rony Figueroa",       store:"Westlake",   ga:17,up:11,prot:0.500,perks:0.875,conv:0.311,hi:1,premium:0.500},
+  {name:"Mark Sosa",           store:"Maricamp",   ga:21,up:13,prot:0.571,perks:0.400,conv:0.394,hi:3,premium:0.316},
+  {name:"Chase Baker",         store:"Ocala",      ga:8, up:12,prot:0.667,perks:1.833,conv:0.145,hi:2,premium:0.750},
+  {name:"Daisy Castellanos",   store:"Westlake",   ga:5, up:8, prot:1.250,perks:0.444,conv:0.236,hi:1,premium:0.889},
+  {name:"Lily Cobb",           store:"Okeechobee", ga:6, up:27,prot:0.667,perks:0.320,conv:0.141,hi:2,premium:0.542},
+  {name:"Debora Lerma",        store:"Clewiston",  ga:25,up:5, prot:0.529,perks:0.600,conv:0.242,hi:3,premium:0.444},
+  {name:"Dakota Rode",         store:"Maricamp",   ga:11,up:17,prot:0.727,perks:0.400,conv:0.262,hi:2,premium:0.480},
+  {name:"Tytus Hebron",        store:"Orlando",    ga:11,up:7, prot:0.500,perks:0.917,conv:0.225,hi:3,premium:1.000},
+  {name:"Summer Glenn",        store:"Ocala",      ga:11,up:13,prot:0.563,perks:0.636,conv:0.185,hi:2,premium:0.316},
+  {name:"Lidyanette Santiago", store:"Apopka",     ga:8, up:17,prot:0.667,perks:0.467,conv:0.167,hi:1,premium:0.600},
+  {name:"Ronald Doren",        store:"Ocala",      ga:6, up:4, prot:0.800,perks:0.875,conv:0.158,hi:1,premium:0.500},
+  {name:"Mark Garden",         store:"Apopka",     ga:14,up:9, prot:0.474,perks:0.600,conv:0.205,hi:1,premium:0.478},
+  {name:"Yessenia Hernandez",  store:"Clewiston",  ga:9, up:12,prot:0.375,perks:0.500,conv:0.116,hi:1,premium:0.737},
+  {name:"Dai Gentry",          store:"Orlando",    ga:7, up:9, prot:0.333,perks:0.750,conv:0.175,hi:1,premium:0.800},
+  {name:"Megan Benitez",       store:"Ocala",      ga:3, up:9, prot:0.571,perks:0.333,conv:0.151,hi:2,premium:0.556},
+  {name:"Timothy Beauregard",  store:"Ocala",      ga:4, up:12,prot:0.357,perks:0.176,conv:0.123,hi:1,premium:0.500},
+  {name:"Kendra Freeman",      store:"Clewiston",  ga:0, up:4, prot:0.719,perks:0.793,conv:0.026,hi:0,premium:0.000},
+  {name:"Ashlee Ramos",        store:"Westlake",   ga:0, up:1, prot:0.500,perks:0.333,conv:0.015,hi:0,premium:0.000},
+];
+
+let editIndex = -1;
+
+// ── SCORE ─────────────────────────────────────────────────────────────────────
+function getT(store){ return storeTargets[store] || storeTargets['Kirkman']; }
+
+function calcScore(rep){
+  const t = getT(rep.store);
+  let s = 0;
+  kpiConfig.forEach(k => {
+    const val = rep[k.id] || 0;
+    const tgt = t[k.id] || 1;
+    s += (Math.min(val, tgt * 1.5) / tgt) * k.weight;
+  });
+  return Math.round(s * 1000) / 1000;
+}
+
+function scoreClass(s){ return s>=0.90?'score-high':s>=0.65?'score-mid':'score-low'; }
+function barColor(s)  { return s>=0.90?'#2ECC71':s>=0.65?'#F39C12':'#E74C3C'; }
+function kpiClass(val,tgt){
+  const r=val/tgt;
+  return r>=1.0?'hit':r>=0.80?'close':'miss';
+}
+function fmtPct(v){ return (v*100).toFixed(0)+'%'; }
+function fmtVal(k,v){ return k.isPct ? fmtPct(v) : (v||0); }
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render(){
+  renderWeightBar();
+  const sorted = reps.map((r,i)=>({...r,score:calcScore(r),origIdx:i})).sort((a,b)=>b.score-a.score);
+  renderPodium(sorted);
+  renderTableHead();
+  renderTable(sorted);
+}
+
+function renderWeightBar(){
+  document.getElementById('weightBar').innerHTML =
+    '<span style="font-family:\'Barlow Condensed\';font-weight:700;font-size:11px;letter-spacing:2px;color:#555;text-transform:uppercase;margin-right:4px;">KPI WEIGHTS:</span>' +
+    kpiConfig.map(k=>`<div class="weight-item"><div class="weight-dot" style="background:${k.color}"></div>${k.label} ${Math.round(k.weight*100)}%</div>`).join('');
+}
+
+function renderTableHead(){
+  document.getElementById('tableHead').innerHTML =
+    '<th>#</th><th>Rep / Store</th>' +
+    kpiConfig.map(k=>`<th>${k.label}</th>`).join('') +
+    '<th>KPI Score</th><th></th>';
+}
+
+function renderPodium(sorted){
+  const order=[sorted[1],sorted[0],sorted[2]];
+  const cls=['rank-2','rank-1','rank-3'];
+  const medals=['🥈','🥇','🥉'];
+  const labels=['#2 · RUNNER UP','#1 · TOP REP','#3 · THIRD PLACE'];
+  document.getElementById('podium').innerHTML = order.map((rep,i)=>{
+    if(!rep) return '';
+    const t=getT(rep.store);
+    return `<div class="podium-card ${cls[i]}">
+      <span class="podium-medal">${medals[i]}</span>
+      <div class="podium-rank">${labels[i]}</div>
+      <div class="podium-name">${rep.name}</div>
+      <div class="podium-store">${rep.store}</div>
+      <div class="podium-score">${(rep.score*100).toFixed(1)}%</div>
+      <div class="podium-score-label">KPI Score</div>
+      <div class="podium-kpis">
+        <div class="podium-kpi"><div class="podium-kpi-label">CGSA</div><div class="podium-kpi-val">${rep.ga} / ${t.ga}</div></div>
+        <div class="podium-kpi"><div class="podium-kpi-label">Upgrades</div><div class="podium-kpi-val">${rep.up} / ${t.up}</div></div>
+        <div class="podium-kpi"><div class="podium-kpi-label">Protection</div><div class="podium-kpi-val">${fmtPct(rep.prot)}</div></div>
+        <div class="podium-kpi"><div class="podium-kpi-label">Perks</div><div class="podium-kpi-val">${fmtPct(rep.perks)}</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderTable(sorted){
+  document.getElementById('leaderboardBody').innerHTML = sorted.map((rep,rankIdx)=>{
+    const t=getT(rep.store); const sc=rep.score;
+    return `<tr>
+      <td><span class="rank-num">${rankIdx+1}</span></td>
+      <td><div class="rep-name">${rep.name}</div><div class="rep-store">${rep.store}</div></td>
+      ${kpiConfig.map(k=>{
+        const val=rep[k.id]||0; const tgt=t[k.id]||1;
+        return `<td><span class="kpi-val ${kpiClass(val,tgt)}">${fmtVal(k,val)}</span></td>`;
+      }).join('')}
+      <td>
+        <span class="score-pill ${scoreClass(sc)}">${(sc*100).toFixed(1)}%</span>
+        <div class="score-bar"><div class="score-bar-fill" style="width:${Math.min(sc*100,100)}%;background:${barColor(sc)}"></div></div>
+      </td>
+      <td><button class="edit-btn" onclick="openEditModal(${rep.origIdx})">Edit</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// ── EDIT MODAL ────────────────────────────────────────────────────────────────
+function openEditModal(idx){
+  editIndex=idx; const r=reps[idx];
+  document.getElementById('modalTitle').textContent='Edit: '+r.name;
+  document.getElementById('f-name').value=r.name;
+  document.getElementById('f-store').value=r.store;
+  document.getElementById('f-ga').value=r.ga;
+  document.getElementById('f-up').value=r.up;
+  document.getElementById('f-prot').value=r.prot;
+  document.getElementById('f-perks').value=r.perks;
+  document.getElementById('f-conv').value=r.conv;
+  document.getElementById('f-hi').value=r.hi;
+  document.getElementById('f-premium').value=r.premium||0;
+  document.getElementById('deleteBtn').style.display='inline-flex';
+  document.getElementById('editModal').classList.add('open');
+}
+function openAddModal(){
+  editIndex=-1;
+  ['f-name','f-ga','f-up','f-prot','f-perks','f-conv','f-hi','f-premium'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-store').value='Kirkman';
+  document.getElementById('modalTitle').textContent='Add New Rep';
+  document.getElementById('deleteBtn').style.display='none';
+  document.getElementById('editModal').classList.add('open');
+}
+function closeModal(){ document.getElementById('editModal').classList.remove('open'); }
+function saveRep(){
+  const rep={
+    name:document.getElementById('f-name').value.trim(),
+    store:document.getElementById('f-store').value,
+    ga:parseFloat(document.getElementById('f-ga').value)||0,
+    up:parseFloat(document.getElementById('f-up').value)||0,
+    prot:parseFloat(document.getElementById('f-prot').value)||0,
+    perks:parseFloat(document.getElementById('f-perks').value)||0,
+    conv:parseFloat(document.getElementById('f-conv').value)||0,
+    hi:parseFloat(document.getElementById('f-hi').value)||0,
+    premium:parseFloat(document.getElementById('f-premium').value)||0,
+  };
+  if(!rep.name){alert('Please enter a rep name.');return;}
+  if(editIndex>=0) reps[editIndex]=rep; else reps.push(rep);
+  closeModal(); render();
+}
+function deleteRep(){
+  if(!confirm(`Remove ${reps[editIndex].name}?`)) return;
+  reps.splice(editIndex,1); closeModal(); render();
+}
+
+// ── TARGETS MODAL ─────────────────────────────────────────────────────────────
+function openTargetsModal(){
+  const inp=(stretch)=>`background:rgba(255,255,255,${stretch?'0.03':'0.05'});border:1px solid ${stretch?'#1e1e1e':'#2A2A2A'};border-radius:3px;color:${stretch?'#555':'#F0F0F0'};font-family:'Barlow',sans-serif;font-size:11px;padding:4px 6px;width:54px;outline:none;`;
+  // Build header
+  document.getElementById('targetsHead').innerHTML =
+    `<th style="text-align:left;padding:6px 10px;font-family:'Barlow Condensed';font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#888;border-bottom:1px solid #2A2A2A;">Store</th>` +
+    kpiConfig.map(k=>`<th colspan="2" style="padding:6px 4px;font-family:'Barlow Condensed';font-size:10px;letter-spacing:1px;text-transform:uppercase;color:${k.color};border-bottom:2px solid ${k.color};text-align:center;">${k.label}</th>`).join('');
+  // Build rows
+  document.getElementById('targetsTableBody').innerHTML = STORES.map(store=>{
+    const t=storeTargets[store];
+    return `<tr>
+      <td style="padding:5px 10px;font-family:'Barlow Condensed';font-weight:700;font-size:13px;color:#F0F0F0;border-bottom:1px solid #1e1e1e;white-space:nowrap;">${store}</td>
+      ${kpiConfig.map(k=>{
+        const bKey=k.id, sKey=k.id+'S';
+        return `<td style="padding:4px 3px;border-bottom:1px solid #1e1e1e;text-align:center;">
+          <input type="number" style="${inp(false)}" data-store="${store}" data-key="${bKey}" value="${t[bKey]??0}" step="${k.isPct?'0.01':'1'}" min="0" title="Base">
+        </td>
+        <td style="padding:4px 3px;border-bottom:1px solid #1e1e1e;text-align:center;">
+          <input type="number" style="${inp(true)}" data-store="${store}" data-key="${sKey}" value="${t[sKey]??0}" step="${k.isPct?'0.01':'1'}" min="0" title="Stretch">
+        </td>`;
+      }).join('')}
+    </tr>`;
+  }).join('');
+  document.getElementById('targetsModal').classList.add('open');
+}
+function closeTargetsModal(){ document.getElementById('targetsModal').classList.remove('open'); }
+function saveTargets(){
+  document.querySelectorAll('#targetsTableBody input').forEach(inp=>{
+    const val=parseFloat(inp.value);
+    if(!isNaN(val) && val>=0) storeTargets[inp.dataset.store][inp.dataset.key]=val;
+  });
+  closeTargetsModal(); render();
+}
+
+// ── IMPORT ────────────────────────────────────────────────────────────────────
+const EXCLUDE_NAMES=['brian wendt','julissa pelayo','danielle mears','demetri applewhaite','diego rodriguez','total','unattended','unknown','wz 1330','applied filters'];
+const STORE_MAP={
+  'roxana hernandez':'Okeechobee','chris bullock':'Okeechobee','christofer bullock':'Okeechobee',
+  'lily cobb':'Okeechobee','vance denton':'Okeechobee','garrick anglin':'Okeechobee','abdul mansoor':'Okeechobee',
+  'chase baker':'Ocala','reuben rosa':'Ocala','summer glenn':'Ocala','megan benitez':'Ocala','ronald doren':'Ocala','timothy beauregard':'Ocala','tianna rivera':'Ocala',
+  'dakota rode':'Maricamp','mark sosa':'Maricamp','jason crane':'Maricamp','norman bellorin':'Maricamp',
+  'dayan rojas':'Boca','keonte sims':'Boca',
+  'christopher vanegas':'Clewiston','debora lerma':'Clewiston','yessenia hernandez':'Clewiston','kendra freeman':'Clewiston',
+  'daisy castellanos':'Westlake','denzel johnson':'Westlake','rony figueroa':'Westlake','ashlee ramos':'Westlake',
+  'gary padgett':'Royal Palm','christopher saydeh':'Royal Palm',
+  'mark garden':'Apopka','lidyanette santiago':'Apopka',
+  'tytus hebron':'Orlando','dai gentry':'Orlando','olivia friday':'Orlando',
+  'jeremy dominguez':'Kirkman','antonio fergile':'Kirkman','jeremy phillips':'Kirkman',
+  'wael elberry':'Kirkman','laura caro':'Kirkman','matheus costa':'Kirkman','odenel pubien':'Kirkman',
+};
+const COL_MAP={
+  'employee full name':'name','consumer smt ga':'ga','smt ga':'ga',
+  'smt upgrades':'up','upgrades':'up','box conv %':'conv','box conv':'conv',
+  'home int':'hi','vhi':'hi','vz fwa opp qty':'hi',
+  'vz protection %':'prot','vz protect %':'prot',
+  'vz perks rate':'perks','perks':'perks',
+  'mypplan prem smt upg take rate':'premium','consumer prem unlim %':'premium',
+};
+let pendingImport=[];
+
+function handleFileDrop(e){e.preventDefault();document.getElementById('importDropZone').style.borderColor='#3A3A3A';const f=e.dataTransfer.files[0];if(f)processFile(f);}
+function handleFileSelect(e){const f=e.target.files[0];if(f)processFile(f);}
+function showStatus(msg,type){
+  const el=document.getElementById('importStatus');el.style.display='block';
+  el.style.background=type==='error'?'rgba(231,76,60,0.15)':'rgba(46,204,113,0.1)';
+  el.style.border=`1px solid ${type==='error'?'rgba(231,76,60,0.3)':'rgba(46,204,113,0.25)'}`;
+  el.style.color=type==='error'?'#E74C3C':'#2ECC71';el.textContent=msg;
+}
+function resetImport(){
+  pendingImport=[];
+  document.getElementById('importStatus').style.display='none';
+  document.getElementById('importPreview').style.display='none';
+  document.getElementById('importConfirmBtn').style.display='none';
+  document.getElementById('importFileInput').value='';
+}
+function processFile(file){
+  resetImport();
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const wb=XLSX.read(e.target.result,{type:'array'});
+      const sheetName=wb.SheetNames.find(s=>s==='Raw Data')||wb.SheetNames.find(s=>s==='Current Month')||wb.SheetNames[0];
+      const rows=XLSX.utils.sheet_to_json(wb.Sheets[sheetName],{header:1,defval:''});
+      let hRow=-1;
+      for(let i=0;i<Math.min(rows.length,10);i++){
+        const r=rows[i].map(c=>String(c).toLowerCase()).join('|');
+        if(r.includes('employee full name')||r.includes('consumer smt ga')){hRow=i;break;}
+      }
+      if(hRow===-1){showStatus('❌ Could not find column headers.','error');return;}
+      const headers=rows[hRow].map(c=>String(c).toLowerCase().trim());
+      const colIdx={};
+      headers.forEach((h,i)=>{if(COL_MAP[h]) colIdx[COL_MAP[h]]=i;});
+      if(colIdx.name===undefined){showStatus('❌ Could not find "Employee Full Name" column.','error');return;}
+      pendingImport=[];
+      for(let i=hRow+1;i<rows.length;i++){
+        const row=rows[i];
+        const rawName=String(row[colIdx.name]||'').trim();
+        if(!rawName||EXCLUDE_NAMES.some(x=>rawName.toLowerCase().includes(x))) continue;
+        const ga=parseFloat(row[colIdx.ga])||0;
+        const up=parseFloat(row[colIdx.up])||0;
+        if(ga===0&&up===0) continue;
+        const store=STORE_MAP[rawName.toLowerCase()]||'Unknown';
+        pendingImport.push({
+          name:rawName,store,
+          ga,up,
+          prot:parseFloat(row[colIdx.prot])||0,
+          perks:parseFloat(row[colIdx.perks])||0,
+          conv:parseFloat(row[colIdx.conv])||0,
+          hi:parseFloat(row[colIdx.hi])||0,
+          premium:parseFloat(row[colIdx.premium])||0,
+        });
+      }
+      if(pendingImport.length===0){showStatus('❌ No valid rep data found.','error');return;}
+      showStatus(`✅ Found ${pendingImport.length} reps from "${sheetName}" tab`,'success');
+      // Preview
+      const prev=document.getElementById('importPreview');prev.style.display='block';
+      document.getElementById('importPreviewHead').innerHTML='<th style="padding:6px 8px;text-align:left;color:#888;font-size:10px;">Rep</th><th style="padding:6px 8px;color:#888;font-size:10px;">Store</th><th style="padding:6px 8px;color:#888;font-size:10px;">CGSA</th><th style="padding:6px 8px;color:#888;font-size:10px;">Protection</th>';
+      document.getElementById('importPreviewBody').innerHTML=pendingImport.slice(0,8).map(r=>`<tr style="border-bottom:1px solid #1e1e1e;"><td style="padding:5px 8px;font-size:11px;color:#F0F0F0;">${r.name}</td><td style="padding:5px 8px;font-size:11px;color:#888;">${r.store}</td><td style="padding:5px 8px;font-size:11px;text-align:center;">${r.ga}</td><td style="padding:5px 8px;font-size:11px;text-align:center;">${fmtPct(r.prot)}</td></tr>`).join('');
+      document.getElementById('importConfirmBtn').style.display='inline-flex';
+    }catch(err){showStatus('❌ Error reading file: '+err.message,'error');}
+  };
+  reader.readAsArrayBuffer(file);
+}
+function confirmImport(){
+  reps=pendingImport;
+  document.getElementById('importModal').classList.remove('open');
+  resetImport(); render();
+}
+
+// Close on overlay click
+document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
+
+render();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</body>
+</html>
